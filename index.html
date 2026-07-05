@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildPriceIQ - Smart Construction Material Prices</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <i class="fas fa-hard-hat"></i>
+            <span>BuildPriceIQ</span>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <a href="#" id="homeLink" class="nav-link">Home</a>
+            <a href="compare.html" class="nav-link">Compare Prices</a>
+            <a href="estimator.html" class="nav-link">Cost Estimator</a>
+            <a href="trends.html" class="nav-link">Market Trends</a>
+            <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="nav-buttons" id="navButtons">
+            <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+            <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+        </div>
+        <div class="user-menu" id="userMenu" style="display: none;">
+            <span id="userName"></span>
+            <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Smart Price Intelligence for<br>
+                    <span class="highlight">Construction Materials</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Compare prices from multiple suppliers, track market trends, 
+                    and estimate project costs - all in one platform.
+                </p>
+                <div class="hero-buttons">
+                    <a href="compare.html" class="btn btn-primary">
+                        Start Comparing <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <button class="btn btn-outline" onclick="openModal('registerModal')">
+                        Join as Supplier <i class="fas fa-store"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="supplierCount">0</div>
+                    <div class="stat-label">Active Suppliers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="materialCount">0</div>
+                    <div class="stat-label">Materials Tracked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="priceUpdateCount">0</div>
+                    <div class="stat-label">Price Updates</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose BuildPriceIQ?</h2>
+            <p class="section-subtitle">Everything you need to make informed construction decisions</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-search-dollar"></i></div>
+                    <h3>Compare Prices</h3>
+                    <p>View real-time prices from multiple verified suppliers across Zimbabwe. Find the best deals instantly.</p>
+                    <a href="compare.html" class="feature-link">Compare Now →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-calculator"></i></div>
+                    <h3>Cost Estimator</h3>
+                    <p>Calculate material requirements and total project costs based on your house size.</p>
+                    <a href="estimator.html" class="feature-link">Estimate Now →</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Market Trends</h3>
+                    <p>Track historical price movements and get predictions to time your purchases perfectly.</p>
+                    <a href="trends.html" class="feature-link">View Trends →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Search Materials</h3>
+                    <p>Enter the construction material you need - cement, bricks, steel, sand, or timber.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Compare Suppliers</h3>
+                    <p>See prices from multiple suppliers ranked from lowest to highest.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Save Money</h3>
+                    <p>Choose the best deal and contact the supplier directly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to start saving on construction materials?</h2>
+                <p>Join hundreds of contractors and homeowners using BuildPriceIQ</p>
+                <div class="cta-buttons">
+                    <a href="compare.html" class="btn btn-primary btn-large">Start Comparing</a>
+                    <button class="btn btn-outline btn-large" onclick="openModal('registerModal')">Register Free</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-hard-hat"></i> BuildPriceIQ</h3>
+                    <p>Smart price intelligence for construction materials in Zimbabwe.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="compare.html">Compare Prices</a>
+                    <a href="estimator.html">Cost Estimator</a>
+                    <a href="trends.html">Market Trends</a>
+                </div>
+                <div class="footer-section">
+                    <h4>For Suppliers</h4>
+                    <a href="#" onclick="openModal('registerModal')">Join Platform</a>
+                    <a href="supplier_guide.html">Supplier Guide</a>
+                    <a href="pricing_policy.html">Pricing Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BuildPriceIQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login to BuildPriceIQ</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('registerModal')">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Create Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type *</label>
+                    <select id="regRole" required>
+                        <option value="customer">Customer</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+                <div id="supplierFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Business Name *</label>
+                        <input type="text" id="businessName">
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="businessLocation">
+                            <option value="">Select location</option>
+                            <option value="harare">Harare</option>
+                            <option value="bulawayo">Bulawayo</option>
+                            <option value="mutare">Mutare</option>
+                            <option value="gweru">Gweru</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="businessPhone">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchModal('loginModal')">Login</a></p>
+        </div>
+    </div>
+    <script>
+
+
+ async function updateHomeLink() {
+    try {
+        const response = await fetch('php/auth/session.php');
+        const data = await response.json();
+        
+        const homeLink = document.getElementById('homeLink');
+       
+        
+        if (data.logged_in) {
+            if (data.user.role === 'admin') {
+                homeLink.href = 'admin.html';
+                homeLink.textContent = '🏠 Admin Home';
+            } else if (data.user.role === 'supplier') {
+                homeLink.href = 'supplier.html';
+                homeLink.textContent = '🏠 Supplier Home';
+            } else {
+                homeLink.href = 'index.html';
+                homeLink.textContent = 'Home';
+            }
+        } else {
+            homeLink.href = 'index.html';
+            homeLink.textContent = 'Home';
+        }
+    } catch (error) {
+        console.error('Error updating home link:', error);
+    }
+}
+    </script>
+    <script src="script.js"></script>
+    <script>
+async function updateHomeLink() {
+    try {
+        const response = await fetch('php/auth/session.php');
+        const data = await response.json();
+        
+        const homeLink = document.getElementById('homeLink');
+        
+        if (data.logged_in) {
+            if (data.user.role === 'admin') {
+                homeLink.href = 'admin.html';
+                homeLink.textContent = '🏠 Admin Home';
+            } else if (data.user.role === 'supplier') {
+                homeLink.href = 'supplier.html';
+                homeLink.textContent = '🏠 Supplier Home';
+            } else {
+                homeLink.href = 'index.html';
+                homeLink.textContent = 'Home';
+            }
+        } else {
+            homeLink.href = 'index.html';
+            homeLink.textContent = 'Home';
+        }
+    } catch (error) {
+        console.error('Error updating home link:', error);
+    }
+}
+    // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+        }
+
+        function switchModal(targetModal) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            openModal(targetModal);
+        }
+
+    
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('php/api/get_stats.php');
+                const stats = await response.json();
+                document.getElementById('supplierCount').textContent = stats.supplier_count || 0;
+                document.getElementById('materialCount').textContent = stats.material_count || 0;
+                document.getElementById('priceUpdateCount').textContent = stats.price_updates || 0;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        // Toggle supplier fields on registration
+        
+        document.getElementById('regRole')?.addEventListener('change', function() {
+            const supplierFields = document.getElementById('supplierFields');
+            if (this.value === 'supplier') {
+                supplierFields.style.display = 'block';
+            } else {
+                supplierFields.style.display = 'none';
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            checkSession();
+        });
+    </script>
+</body>
+</html>

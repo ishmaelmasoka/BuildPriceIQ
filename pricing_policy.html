@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Policy - BuildPriceIQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <i class="fas fa-hard-hat"></i>
+            <span>BuildPriceIQ</span>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <a href="#" id="homeLink" class="nav-link">Home</a>
+            <a href="compare.html" class="nav-link">Compare Prices</a>
+            <a href="estimator.html" class="nav-link">Cost Estimator</a>
+            <a href="trends.html" class="nav-link">Market Trends</a>
+            <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="nav-buttons" id="navButtons">
+            <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+            <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+        </div>
+        <div class="user-menu" id="userMenu" style="display: none;">
+            <span id="userName"></span>
+            <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="section-title">Pricing Policy</h1>
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="background: #f3f4f6; border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+                    <h2><i class="fas fa-users"></i> For Customers</h2>
+                    <p style="margin: 1rem 0;">✅ <strong>Free to use</strong> - No charges for searching and comparing prices</p>
+                    <p>✅ <strong>No hidden fees</strong> - You pay suppliers directly</p>
+                    <p>✅ <strong>Price estimates</strong> are for reference only</p>
+                    <p>✅ <strong>No registration required</strong> to search and compare</p>
+                </div>
+
+                <div style="background: #f3f4f6; border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+                    <h2><i class="fas fa-store"></i> For Suppliers</h2>
+                    <p style="margin: 1rem 0;">✅ <strong>Free registration</strong> - No upfront costs to join</p>
+                    <p>✅ <strong>Commission</strong> - 5% of successful sales referred through platform</p>
+                    <p>✅ <strong>Premium features</strong> coming soon (featured listings, analytics)</p>
+                    <p>✅ <strong>Prices must be accurate</strong> - False pricing leads to account suspension</p>
+                    <p>✅ <strong>Stock updates</strong> - Keep your inventory information current</p>
+                </div>
+
+                <div style="background: #f3f4f6; border-radius: 16px; padding: 2rem;">
+                    <h2><i class="fas fa-shield-alt"></i> Terms</h2>
+                    <p style="margin: 1rem 0;">BuildPriceIQ acts as a marketplace connecting buyers and sellers. We verify suppliers but are not responsible for transaction disputes. All prices are shown in USD. Prices may change without notice.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BuildPriceIQ</h3>
+                    <p>Smart price intelligence for construction materials.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="supplier_guide.html">Supplier Guide</a>
+                    <a href="pricing_policy.html">Pricing Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BuildPriceIQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login to BuildPriceIQ</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('registerModal')">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Create Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type *</label>
+                    <select id="regRole" required>
+                        <option value="customer">Customer</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+                <div id="supplierFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Business Name *</label>
+                        <input type="text" id="businessName">
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="businessLocation">
+                            <option value="">Select location</option>
+                            <option value="harare">Harare</option>
+                            <option value="bulawayo">Bulawayo</option>
+                            <option value="mutare">Mutare</option>
+                            <option value="gweru">Gweru</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="businessPhone">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchModal('loginModal')">Login</a></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>async function updateHomeLink() {
+    try {
+        const response = await fetch('php/auth/session.php');
+        const data = await response.json();
+        
+        const homeLink = document.getElementById('homeLink');
+        if (!homeLink) return;
+        
+        if (data.logged_in) {
+            if (data.user.role === 'admin') {
+                homeLink.href = 'admin.html';
+                homeLink.textContent = '🏠 Admin Home';
+            } else if (data.user.role === 'supplier') {
+                homeLink.href = 'supplier.html';
+                homeLink.textContent = '🏠 Supplier Home';
+            } else {
+                homeLink.href = 'index.html';
+                homeLink.textContent = 'Home';
+            }
+        } else {
+            homeLink.href = 'index.html';
+            homeLink.textContent = 'Home';
+        }
+    } catch (error) {
+        console.error('Error updating home link:', error);
+    }
+}
+
+// Called when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateHomeLink();
+    
+});
+</script>
+</body>
+</html>

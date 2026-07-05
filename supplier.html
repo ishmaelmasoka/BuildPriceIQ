@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Dashboard - BuildPriceIQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-hard-hat"></i>
+                <span>BuildPriceIQ - Supplier</span>
+            </div>
+            <div class="nav-menu">
+                <a href="supplier-dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="compare.html" class="nav-link">Compare Prices</a>
+                <a href="index.html" class="nav-link">View Site</a>
+            </div>
+            <div class="user-menu">
+                <span id="supplierName">Supplier</span>
+                <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 2rem;">
+        <h1>Supplier Dashboard</h1>
+        <p>Manage your prices and stock for construction materials.</p>
+
+        <!-- Add New Product Section -->
+        <div style="background: white; border-radius: 16px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <label>Material Name:</label>
+                    <input type="text" id="materialName" placeholder="e.g., Portland Cement 50kg" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
+                </div>
+                <div>
+                    <label>Price (USD):</label>
+                    <input type="number" id="price" step="0.01" placeholder="e.g., 12.50" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
+                </div>
+                <div>
+                    <label>Stock (optional):</label>
+                    <input type="text" id="stock" placeholder="e.g., 500 bags" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
+                </div>
+                <div>
+                    <label>Category:</label>
+                    <select id="category" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px;">
+                        <option value="cement">Cement</option>
+                        <option value="bricks">Bricks</option>
+                        <option value="steel">Steel</option>
+                        <option value="sand">Sand</option>
+                        <option value="timber">Timber</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="addProduct()" style="margin-top: 1rem; width: 100%; padding: 12px;">
+                <i class="fas fa-save"></i> Add Product
+            </button>
+        </div>
+
+        <!-- Current Products Section -->
+        <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2><i class="fas fa-boxes"></i> My Products</h2>
+            <div id="productsList" style="margin-top: 1rem;">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Update home link based on user role
+async function updateHomeLink() {
+    try {
+        const response = await fetch('php/auth/session.php');
+        const data = await response.json();
+        
+        const homeLink = document.getElementById('homeLink');
+        if (!homeLink) return;
+        
+        if (data.logged_in) {
+            if (data.user.role === 'admin') {
+                homeLink.href = 'admin.html';
+                homeLink.textContent = '🏠 Admin Home';
+            } else if (data.user.role === 'supplier') {
+                homeLink.href = 'supplier.html';
+                homeLink.textContent = '🏠 Supplier Home';
+            } else {
+                homeLink.href = 'index.html';
+                homeLink.textContent = 'Home';
+            }
+        } else {
+            homeLink.href = 'index.html';
+            homeLink.textContent = 'Home';
+        }
+    } catch (error) {
+        console.error('Error updating home link:', error);
+    }
+}
+
+// Call this function when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateHomeLink();
+    // ... other initialization code
+});
+        // Check if supplier is logged in
+        async function checkSupplierAccess() {
+            try {
+                const response = await fetch('php/auth/session.php');
+                const data = await response.json();
+                
+                if (!data.logged_in) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                if (data.user.role !== 'supplier') {
+                    alert('Access denied. Supplier privileges required.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                document.getElementById('supplierName').innerHTML = data.user.name;
+                loadSupplierProducts();
+                
+            } catch (error) {
+                console.error('Supplier check failed:', error);
+                window.location.href = 'index.html';
+            }
+        }
+        
+        async function loadSupplierProducts() {
+            try {
+                const response = await fetch('php/api/get_products.php');
+                const products = await response.json();
+                const container = document.getElementById('productsList');
+                
+                if (!container) return;
+                
+                if (!products || products.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; background: #f9fafb; border-radius: 12px;">
+                            <i class="fas fa-box-open" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></i>
+                            <h3>No Products Yet</h3>
+                            <p>Use the form above to add your first product.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<table style="width: 100%; border-collapse: collapse;">';
+                html += '<thead><tr style="background: #f3f4f6; text-align: left;">';
+                html += '<th style="padding: 12px;">Material</th>';
+                html += '<th style="padding: 12px;">Price (USD)</th>';
+                html += '<th style="padding: 12px;">Category</th>';
+                html += '<th style="padding: 12px;">Last Updated</th>';
+                html += '</tr></thead><tbody>';
+                
+                products.forEach(p => {
+                    html += `<tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px;">${escapeHtml(p.material_name)}</td>
+                        <td style="padding: 12px;">$${parseFloat(p.price).toFixed(2)}</td>
+                        <td style="padding: 12px;">${escapeHtml(p.category || 'other')}</td>
+                        <td style="padding: 12px;">${new Date(p.last_updated).toLocaleDateString()}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                const container = document.getElementById('productsList');
+                if (container) {
+                    container.innerHTML = '<p style="color: red;">Error loading products. Please refresh the page.</p>';
+                }
+            }
+        }
+        
+        async function addProduct() {
+            console.log("Add Product button clicked!");
+            
+            const materialName = document.getElementById('materialName').value;
+            const price = document.getElementById('price').value;
+            const stock = document.getElementById('stock').value;
+            const category = document.getElementById('category').value;
+            
+            console.log("Material:", materialName);
+            console.log("Price:", price);
+            
+            if (!materialName) {
+                alert('Please enter a material name');
+                return;
+            }
+            
+            if (!price || price <= 0) {
+                alert('Please enter a valid price');
+                return;
+            }
+            
+            const priceNum = parseFloat(price);
+            if (isNaN(priceNum)) {
+                alert('Please enter a valid number for price');
+                return;
+            }
+            
+            // Get the button and change its text
+            const btns = document.querySelectorAll('.btn-primary');
+            let submitBtn = null;
+            for (let btn of btns) {
+                if (btn.textContent.includes('Add Product')) {
+                    submitBtn = btn;
+                    break;
+                }
+            }
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            }
+            
+            try {
+                const response = await fetch('php/api/add_product.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        material_name: materialName,
+                        price: priceNum,
+                        stock: stock,
+                        category: category
+                    })
+                });
+                
+                const data = await response.json();
+                console.log("Response:", data);
+                
+                if (data.success) {
+                    alert('✅ Product added successfully!');
+                    document.getElementById('materialName').value = '';
+                    document.getElementById('price').value = '';
+                    document.getElementById('stock').value = '';
+                    loadSupplierProducts();
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Failed to add product: ' + error.message);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Add Product';
+                }
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function logout() {
+            window.location.href = 'php/auth/logout.php';
+        }
+        
+        // Start the supplier check
+        checkSupplierAccess();
+    </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Estimator - BuildPriceIQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <i class="fas fa-hard-hat"></i>
+            <span>BuildPriceIQ</span>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <a href="#" id="homeLink" class="nav-link">Home</a>
+            <a href="compare.html" class="nav-link">Compare Prices</a>
+            <a href="estimator.html" class="nav-link">Cost Estimator</a>
+            <a href="trends.html" class="nav-link">Market Trends</a>
+            <a href="about.html" class="nav-link">About</a>
+        </div>
+        <div class="nav-buttons" id="navButtons">
+            <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+            <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+        </div>
+        <div class="user-menu" id="userMenu" style="display: none;">
+            <span id="userName"></span>
+            <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+    <!-- Main Content -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Project Cost Estimator</h2>
+            <p class="section-subtitle">Get instant material estimates for your construction project</p>
+            
+            <div class="estimator-container">
+                <div class="estimator-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-ruler-combined"></i> House Size (sqm)</label>
+                        <input type="number" id="houseSize" placeholder="e.g., 100" step="10">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-door-open"></i> Number of Rooms</label>
+                        <input type="number" id="roomCount" placeholder="e.g., 3">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-home"></i> Building Type</label>
+                        <select id="buildingType">
+                            <option value="economy">Economy House (Basic finishing)</option>
+                            <option value="standard">Standard House (Good quality)</option>
+                            <option value="premium">Premium House (High-end finishing)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-layer-group"></i> Number of Floors</label>
+                        <input type="number" id="floors" placeholder="e.g., 1" value="1" min="1" max="3">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="calculateEstimatee()">
+                        Calculate Estimate <i class="fas fa-calculator"></i>
+                    </button>
+                </div>
+                <div class="estimator-results" id="estimatorResults" style="display: none;">
+                    <h3>📋 Material Estimate</h3>
+                    <div id="estimateBreakdown"></div>
+                    <div class="total-cost" id="totalCost"></div>
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 1rem; text-align: center;">
+                        *Estimates are based on current market averages. Actual costs may vary.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-hard-hat"></i> BuildPriceIQ</h3>
+                    <p>Smart price intelligence for construction materials in Zimbabwe.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="compare.html">Compare Prices</a>
+                    <a href="estimator.html">Cost Estimator</a>
+                    <a href="trends.html">Market Trends</a>
+                </div>
+                <div class="footer-section">
+                 <h4>For Suppliers</h4>
+                      <a href="#" onclick="openModal('registerModal')">Join Platform</a>
+                      <a href="supplier_guide.html">Supplier Guide</a>
+                      <a href="pricing_policy.html">Pricing Policy</a>
+                    </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BuildPriceIQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login to BuildPriceIQ</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('registerModal')">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Create Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type *</label>
+                    <select id="regRole" required>
+                        <option value="customer">Customer</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+                <div id="supplierFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Business Name *</label>
+                        <input type="text" id="businessName">
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="businessLocation">
+                            <option value="">Select location</option>
+                            <option value="harare">Harare</option>
+                            <option value="bulawayo">Bulawayo</option>
+                            <option value="mutare">Mutare</option>
+                            <option value="gweru">Gweru</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="businessPhone">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchModal('loginModal')">Login</a></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+
+        // Update home link based on user role
+async function updateHomeLink() {
+    try {
+        const response = await fetch('php/auth/session.php');
+        const data = await response.json();
+        
+        const homeLink = document.getElementById('homeLink');
+        if (!homeLink) return;
+        
+        if (data.logged_in) {
+            if (data.user.role === 'admin') {
+                homeLink.href = 'admin.html';
+                homeLink.textContent = '🏠 Admin Home';
+            } else if (data.user.role === 'supplier') {
+                homeLink.href = 'supplier.html';
+                homeLink.textContent = '🏠 Supplier Home';
+            } else {
+                homeLink.href = 'index.html';
+                homeLink.textContent = 'Home';
+            }
+        } else {
+            homeLink.href = 'index.html';
+            homeLink.textContent = 'Home';
+        }
+    } catch (error) {
+        console.error('Error updating home link:', error);
+    }
+}
+
+// Call this function when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateHomeLink();
+
+});
+    </script>
+</body>
+</html>

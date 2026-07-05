@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BuildPriceIQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-hard-hat"></i>
+                <span>BuildPriceIQ - Admin</span>
+            </div>
+            <div class="nav-menu">
+                <a href="admin.html" class="nav-link active">Dashboard</a>
+                <a href="index.html" class="nav-link">View Site</a>
+            </div>
+            <div class="user-menu">
+                <span id="adminName">Admin</span>
+                <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 2rem;">
+        <h1>Admin Dashboard</h1>
+        
+        <!-- Stats Cards -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin: 2rem 0;">
+            <div class="stat-card">
+                <div class="stat-number" id="pendingSuppliers">0</div>
+                <div class="stat-label">Pending Suppliers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="approvedSuppliers">0</div>
+                <div class="stat-label">Approved Suppliers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSuppliers">0</div>
+                <div class="stat-label">Total Suppliers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="unreadMessages">0</div>
+                <div class="stat-label">Unread Messages</div>
+            </div>
+        </div>
+
+        <!-- Pending Suppliers Section -->
+        <div style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2><i class="fas fa-clock"></i> Pending Supplier Approvals</h2>
+            <div id="pendingSuppliersList" style="margin-top: 1rem;">
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Approved Suppliers Section -->
+        <div style="background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2><i class="fas fa-check-circle"></i> Approved Suppliers</h2>
+            <div id="approvedSuppliersList" style="margin-top: 1rem;">
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Messages Section -->
+        <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2><i class="fas fa-envelope"></i> Contact Messages 
+                <button class="btn btn-outline-small" onclick="deleteAllMessages()" style="margin-left: 1rem; background: #dc2626; color: white;">🗑️ Delete All</button>
+            </h2>
+            <div id="messagesList" style="margin-top: 1rem;">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Check if admin is logged in
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch('php/auth/session.php');
+                const data = await response.json();
+                
+                if (!data.logged_in) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                if (data.user.role !== 'admin') {
+                    alert('Access denied. Admin privileges required.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                document.getElementById('adminName').innerHTML = data.user.name;
+                loadDashboard();
+                
+            } catch (error) {
+                console.error('Admin check failed:', error);
+                window.location.href = 'index.html';
+            }
+        }
+        
+        async function loadDashboard() {
+            await loadStats();
+            await loadPendingSuppliers();
+            await loadApprovedSuppliers();
+            await loadMessages();
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('php/api/admin_stats.php');
+                const data = await response.json();
+                
+                document.getElementById('pendingSuppliers').textContent = data.pending || 0;
+                document.getElementById('approvedSuppliers').textContent = data.approved || 0;
+                document.getElementById('totalSuppliers').textContent = data.total || 0;
+                document.getElementById('unreadMessages').textContent = data.unread || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadPendingSuppliers() {
+            try {
+                const response = await fetch('php/api/get_pending_suppliers.php');
+                const suppliers = await response.json();
+                
+                const container = document.getElementById('pendingSuppliersList');
+                
+                if (suppliers.error) {
+                    container.innerHTML = '<p>❌ Error: ' + suppliers.error + '</p>';
+                    return;
+                }
+                
+                if (!suppliers || suppliers.length === 0) {
+                    container.innerHTML = '<p>✅ No pending supplier approvals.</p>';
+                    return;
+                }
+                
+                let html = '';
+                for (let s of suppliers) {
+                    html += `
+                        <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; background: #fef3c7;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <div>
+                                    <strong>🏪 ${escapeHtml(s.business_name)}</strong><br>
+                                    <small>📍 ${escapeHtml(s.location)} | 📞 ${escapeHtml(s.phone)} | 📧 ${escapeHtml(s.email)}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary" style="margin-right: 8px;" onclick="approveSupplier(${s.id})">✅ Approve</button>
+                                    <button class="btn btn-outline" onclick="rejectSupplier(${s.id})">❌ Reject</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading pending suppliers:', error);
+                document.getElementById('pendingSuppliersList').innerHTML = '<p>❌ Error loading pending suppliers.</p>';
+            }
+        }
+        
+        async function loadApprovedSuppliers() {
+            try {
+                const response = await fetch('php/api/get_approved_suppliers.php');
+                const suppliers = await response.json();
+                
+                const container = document.getElementById('approvedSuppliersList');
+                
+                if (suppliers.error) {
+                    container.innerHTML = '<p>❌ Error: ' + suppliers.error + '</p>';
+                    return;
+                }
+                
+                if (!suppliers || suppliers.length === 0) {
+                    container.innerHTML = '<p>📭 No approved suppliers yet.</p>';
+                    return;
+                }
+                
+                let html = '';
+                for (let s of suppliers) {
+                    html += `
+                        <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; background: #dbeafe;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <div>
+                                    <strong>🏪 ${escapeHtml(s.business_name)}</strong><br>
+                                    <small>📍 ${escapeHtml(s.location)} | 📞 ${escapeHtml(s.phone)} | 📧 ${escapeHtml(s.email)}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-danger" onclick="removeSupplier(${s.id}, '${escapeHtml(s.business_name)}')">🗑️ Remove Supplier</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading approved suppliers:', error);
+                document.getElementById('approvedSuppliersList').innerHTML = '<p>❌ Error loading approved suppliers.</p>';
+            }
+        }
+        
+        async function loadMessages() {
+            try {
+                const response = await fetch('php/api/get_messages.php');
+                const messages = await response.json();
+                
+                const container = document.getElementById('messagesList');
+                
+                if (messages.error) {
+                    container.innerHTML = '<p>❌ Error: ' + messages.error + '</p>';
+                    return;
+                }
+                
+                if (!messages || messages.length === 0) {
+                    container.innerHTML = '<p>📭 No messages yet.</p>';
+                    return;
+                }
+                
+                let html = '';
+                for (let m of messages) {
+                    html += `
+                        <div style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; ${m.is_read ? 'opacity: 0.7;' : 'background: #fef3c7; border-left: 4px solid #f59e0b;'}">
+                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                                <div style="flex: 1;">
+                                    <strong>👤 ${escapeHtml(m.name)}</strong> (${escapeHtml(m.email)})<br>
+                                    <small><strong>Subject:</strong> ${escapeHtml(m.subject || 'No subject')}</small><br>
+                                    <p style="margin-top: 8px;">${escapeHtml(m.message)}</p>
+                                    <small>📅 ${new Date(m.created_at).toLocaleString()}</small>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    ${!m.is_read ? `<button class="btn btn-primary btn-small" onclick="markAsRead(${m.id})">✓ Mark Read</button>` : '<span style="color: #10b981;">✓ Read</span>'}
+                                    <button class="btn btn-danger btn-small" onclick="deleteMessage(${m.id})">🗑️ Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messagesList').innerHTML = '<p>❌ Error loading messages.</p>';
+            }
+        }
+        
+        async function approveSupplier(supplierId) {
+            const response = await fetch('php/api/approve_supplier.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ supplier_id: supplierId, action: 'approve' })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('✅ Supplier approved!');
+                loadDashboard();
+            } else {
+                alert('❌ Error: ' + result.message);
+            }
+        }
+        
+        async function rejectSupplier(supplierId) {
+            if (confirm('Are you sure you want to reject this supplier?')) {
+                const response = await fetch('php/api/approve_supplier.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ supplier_id: supplierId, action: 'reject' })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('❌ Supplier rejected and removed.');
+                    loadDashboard();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            }
+        }
+        
+        async function removeSupplier(supplierId, businessName) {
+            if (confirm(`⚠️ Remove "${businessName}"? This cannot be undone!`)) {
+                const response = await fetch('php/api/remove_supplier.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ supplier_id: supplierId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(`✅ Supplier "${businessName}" removed.`);
+                    loadDashboard();
+                } else {
+                    alert('❌ Error: ' + result.message);
+                }
+            }
+        }
+        
+        async function markAsRead(messageId) {
+            const response = await fetch('php/api/mark_message_read.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message_id: messageId })
+            });
+            const result = await response.json();
+            if (result.success) {
+                loadMessages();
+                loadStats();
+            }
+        }
+        
+        async function deleteMessage(messageId) {
+            if (confirm('Delete this message?')) {
+                const response = await fetch('php/api/delete_message.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message_id: messageId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('✅ Message deleted!');
+                    loadMessages();
+                    loadStats();
+                } else {
+                    alert('❌ Error: ' + result.message);
+                }
+            }
+        }
+        
+        async function deleteAllMessages() {
+            if (confirm('⚠️ Delete ALL messages? This cannot be undone!')) {
+                const response = await fetch('php/api/delete_all_messages.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('✅ All messages deleted!');
+                    loadMessages();
+                    loadStats();
+                } else {
+                    alert('❌ Error: ' + result.message);
+                }
+            }
+        }
+        
+        function logout() {
+            window.location.href = 'php/auth/logout.php';
+        }
+        
+        // Start the admin check when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAccess();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Prices - BuildPriceIQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+        <div class="nav-brand">
+            <i class="fas fa-hard-hat"></i>
+            <span>BuildPriceIQ</span>
+        </div>
+        <div class="nav-menu" id="navMenu">
+            <a href="#" id="homeLink" class="nav-link">Home</a>
+            <a href="compare.html" class="nav-link">Compare Prices</a>
+            <a href="estimator.html" class="nav-link">Cost Estimator</a>
+            <a href="trends.html" class="nav-link">Market Trends</a>
+            <a href="about.html" class="nav-link">About</a>
+        </div>
+        
+        <div class="nav-buttons" id="navButtons">
+            <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+            <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+        </div>
+        <div class="user-menu" id="userMenu" style="display: none;">
+            <span id="userName"></span>
+            <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Compare Material Prices</h2>
+            <p class="section-subtitle">Find the best deals from verified suppliers</p>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search for cement, bricks, steel, sand..." onkeyup="searchMaterials()">
+                </div>
+                <div class="filter-group">
+                    <select id="categoryFilter" onchange="searchMaterials()">
+                        <option value="">All Categories</option>
+                        <option value="cement">Cement</option>
+                        <option value="bricks">Bricks</option>
+                        <option value="steel">Steel/Rebar</option>
+                        <option value="sand">Sand</option>
+                        <option value="timber">Timber</option>
+                    </select>
+                    <select id="locationFilter" onchange="searchMaterials()">
+                        <option value="">All Locations</option>
+                        <option value="harare">Harare</option>
+                        <option value="bulawayo">Bulawayo</option>
+                        <option value="mutare">Mutare</option>
+                        <option value="gweru">Gweru</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="resultsContainer" class="results-grid">
+                <div class="loading">Enter a material name to see prices...</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-hard-hat"></i> BuildPriceIQ</h3>
+                    <p>Smart price intelligence for construction materials.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="compare.html">Compare Prices</a>
+                    <a href="estimator.html">Cost Estimator</a>
+                    <a href="trends.html">Market Trends</a>
+                </div>
+                <div class="footer-section">
+                    <h4>For Suppliers</h4>
+                    <a href="#" onclick="openModal('registerModal')">Join Platform</a>
+                    <a href="supplier_guide.html">Supplier Guide</a>
+                    <a href="pricing_policy.html">Pricing Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BuildPriceIQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login to BuildPriceIQ</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('registerModal')">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Create Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type *</label>
+                    <select id="regRole" required>
+                        <option value="customer">Customer</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+                <div id="supplierFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Business Name *</label>
+                        <input type="text" id="businessName">
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="businessLocation">
+                            <option value="">Select location</option>
+                            <option value="harare">Harare</option>
+                            <option value="bulawayo">Bulawayo</option>
+                            <option value="mutare">Mutare</option>
+                            <option value="gweru">Gweru</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="businessPhone">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchModal('loginModal')">Login</a></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+
+// Update home link based on user role
+async function updateHomeLink() {
+    try {
+        const response = await fetch('php/auth/session.php');
+        const data = await response.json();
+        
+        const homeLink = document.getElementById('homeLink');
+        if (!homeLink) return;
+        
+        if (data.logged_in) {
+            if (data.user.role === 'admin') {
+                homeLink.href = 'admin.html';
+                homeLink.textContent = '🏠 Admin Home';
+            } else if (data.user.role === 'supplier') {
+                homeLink.href = 'supplier.html';
+                homeLink.textContent = '🏠 Supplier Home';
+            } else {
+                homeLink.href = 'index.html';
+                homeLink.textContent = 'Home';
+            }
+        } else {
+            homeLink.href = 'index.html';
+            homeLink.textContent = 'Home';
+        }
+    } catch (error) {
+        console.error('Error updating home link:', error);
+    }
+}
+
+// Call this function when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateHomeLink();
+   
+});
+        // Search function with stock display
+        async function searchMaterials() {
+            const query = document.getElementById('searchInput')?.value || '';
+            const category = document.getElementById('categoryFilter')?.value || '';
+            const location = document.getElementById('locationFilter')?.value || '';
+            
+            const container = document.getElementById('resultsContainer');
+            if (!container) return;
+            
+            if (!query && !category) {
+                container.innerHTML = '<div class="loading">🔍 Enter a material name to search (e.g., cement, bricks)</div>';
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading">⏳ Searching for prices...</div>';
+            
+            try {
+                const url = `php/api/search.php?query=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&location=${encodeURIComponent(location)}`;
+                console.log('Fetching:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const results = await response.json();
+                console.log('Results:', results);
+                
+                if (results.error) {
+                    container.innerHTML = `<div class="loading">❌ ${results.error}</div>`;
+                    return;
+                }
+                
+                if (results.message) {
+                    container.innerHTML = `<div class="loading">⚠️ ${results.message}</div>`;
+                    return;
+                }
+                
+                if (!results || results.length === 0) {
+                    container.innerHTML = '<div class="loading">😕 No results found. Try "cement", "bricks", or "steel"</div>';
+                    return;
+                }
+                
+                // Display results with stock information
+                container.innerHTML = results.map(result => `
+                    <div class="result-card">
+                        <div class="supplier-name">🏪 ${escapeHtml(result.supplier_name)}</div>
+                        <div class="material-name">📦 ${escapeHtml(result.material_name)}</div>
+                        <div class="price">💰 $${parseFloat(result.price).toFixed(2)}</div>
+                        ${result.stock_display ? `<div class="stock">📊 In Stock: ${escapeHtml(result.stock_display)}</div>` : ''}
+                        <div class="location">📍 ${escapeHtml(result.location || 'Unknown')}</div>
+                        ${result.supplier_phone ? `<div class="phone">📞 ${escapeHtml(result.supplier_phone)}</div>` : ''}
+                        <div class="last-updated">🕐 Updated: ${new Date(result.date_recorded).toLocaleDateString()}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                container.innerHTML = `<div class="loading">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Make search available globally
+        window.searchMaterials = searchMaterials;
+    </script>
+</body>
+</html>

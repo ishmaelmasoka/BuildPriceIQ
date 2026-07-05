@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Trends - BuildPriceIQ</title>
+    <!-- FIXED: Correct CSS path -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-hard-hat"></i>
+                <span>BuildPriceIQ</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#" id="homeLink" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link">Compare Prices</a>
+                <a href="estimator.html" class="nav-link">Cost Estimator</a>
+                <a href="trends.html" class="nav-link active">Market Trends</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+            <div class="nav-buttons" id="navButtons">
+                <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+                <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <span id="userName"></span>
+                <button class="btn btn-outline-small" onclick="logout()">Logout</button>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Market Price Trends</h2>
+            <p class="section-subtitle">Track historical price movements and predict future costs</p>
+            
+            <div class="trends-controls">
+                <select id="trendMaterial" onchange="loadTrends()">
+                    <option value="cement">Cement (50kg bag)</option>
+                    <option value="bricks">Bricks (per 1000)</option>
+                    <option value="steel">Steel (12mm rebar)</option>
+                    <option value="sand">Sand (per cubic meter)</option>
+                    <option value="timber">Timber (4x2 pine)</option>
+                </select>
+                <select id="trendPeriod" onchange="loadTrends()">
+                    <option value="3">Last 3 months</option>
+                    <option value="6" selected>Last 6 months</option>
+                    <option value="12">Last 12 months</option>
+                </select>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="priceTrendChart"></canvas>
+            </div>
+            
+            <div class="prediction-card" id="predictionCard">
+                <h4><i class="fas fa-chart-line"></i> Price Prediction</h4>
+                <p id="predictionText">Select a material to see prediction</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BuildPriceIQ</h3>
+                    <p>Smart price intelligence for construction materials.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="compare.html">Compare Prices</a>
+                    <a href="estimator.html">Cost Estimator</a>
+                    <a href="trends.html">Market Trends</a>
+                </div>
+                <div class="footer-section">
+                    <h4>For Suppliers</h4>
+                    <a href="#" onclick="openModal('registerModal')">Join Platform</a>
+                    <a href="supplier-guide.html">Supplier Guide</a>
+                    <a href="pricing-policy.html">Pricing Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 BuildPriceIQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Login to BuildPriceIQ</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('registerModal')">Register</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Create Account</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type *</label>
+                    <select id="regRole" required>
+                        <option value="customer">Customer</option>
+                        <option value="supplier">Supplier</option>
+                    </select>
+                </div>
+                <div id="supplierFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Business Name *</label>
+                        <input type="text" id="businessName">
+                    </div>
+                    <div class="form-group">
+                        <label>Location *</label>
+                        <select id="businessLocation">
+                            <option value="">Select location</option>
+                            <option value="harare">Harare</option>
+                            <option value="bulawayo">Bulawayo</option>
+                            <option value="mutare">Mutare</option>
+                            <option value="gweru">Gweru</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="businessPhone">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchModal('loginModal')">Login</a></p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        let priceTrendChart = null;
+
+        async function updateHomeLink() {
+            try {
+                const response = await fetch('php/auth/session.php');
+                const data = await response.json();
+                
+                const homeLink = document.getElementById('homeLink');
+               
+                if (data.logged_in) {
+                    if (data.user.role === 'admin') {
+                        homeLink.href = 'admin.html';
+                        homeLink.textContent = '🏠 Admin Home';
+                    } else if (data.user.role === 'supplier') {
+                        homeLink.href = 'supplier-dashboard.html';
+                        homeLink.textContent = '🏠 Supplier Home';
+                    } else {
+                        homeLink.href = 'index.html';
+                        homeLink.textContent = 'Home';
+                    }
+                } else {
+                    homeLink.href = 'index.html';
+                    homeLink.textContent = 'Home';
+                }
+            } catch (error) {
+                console.error('Error updating home link:', error);
+            }
+        }
+
+        async function loadTrends() {
+            const material = document.getElementById('trendMaterial')?.value || 'cement';
+            const months = document.getElementById('trendPeriod')?.value || 6;
+            
+            const predictionText = document.getElementById('predictionText');
+            if (predictionText) {
+                predictionText.innerHTML = '⏳ Loading price data...';
+            }
+            
+            try {
+                // FIXED: Correct API path
+                const response = await fetch(`php/api/get_trends.php?material=${material}&months=${months}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data); // Debug: See what's returned
+
+                if (data.error) {
+                    console.error('Error loading trends:', data.error);
+                    showDemoTrends();
+                    return;
+                }
+                
+                // Check if we have real data from database
+                if (data.dates && data.dates.length > 0 && !data.message) {
+                    // Real database data
+                    updateChart(data.dates, data.prices);
+                    updatePrediction(data.prediction);
+                    console.log('✅ Loaded real data for:', data.material);
+                } else if (data.message) {
+                    // No data message from API
+                    updateChart(data.dates, data.prices);
+                    updatePrediction(data.prediction);
+                    if (predictionText) {
+                        predictionText.innerHTML = `⚠️ ${data.message}<br><br>💡 Tip: Login as supplier to add prices.`;
+                    }
+                } else {
+                    // Fallback to demo
+                    showDemoTrends();
+                }
+               
+            } catch (error) {
+                console.error('Failed to load trends:', error);
+                showDemoTrends();
+            }
+        }
+
+        function showDemoTrends() {
+            const demoDates = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const demoPrices = [11.50, 11.80, 12.00, 12.30, 12.50, 12.75];
+            updateChart(demoDates, demoPrices);
+            updatePrediction({
+                next_month: 13.00,
+                trend: 'increasing',
+                change: 2.0
+            });
+            console.log('Showing demo trends (no database data)');
+        }
+
+        function updateChart(dates, prices) {
+            const ctx = document.getElementById('priceTrendChart')?.getContext('2d');
+            if (!ctx) return;
+            
+            if (priceTrendChart) {
+                priceTrendChart.destroy();
+            }
+            
+            priceTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Average Price ($)',
+                        data: prices,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#fff',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updatePrediction(prediction) {
+            const predictionText = document.getElementById('predictionText');
+            if (!predictionText) return;
+            
+            if (prediction && prediction.next_month) {
+                const trendIcon = prediction.trend === 'increasing' ? '📈' : 
+                                 (prediction.trend === 'decreasing' ? '📉' : '➡️');
+                const trendColor = prediction.trend === 'increasing' ? '#ef4444' : 
+                                  (prediction.trend === 'decreasing' ? '#10b981' : '#f59e0b');
+                predictionText.innerHTML = `
+                    ${trendIcon} <strong>Next month's predicted price:</strong> <span style="color: ${trendColor}">$${prediction.next_month}</span><br>
+                    <strong>Trend:</strong> ${prediction.trend} (${prediction.change}% change)
+                `;
+            } else {
+                predictionText.innerHTML = '📊 Insufficient data for prediction. Add more price records to see trends.';
+            }
+        }
+
+        // Load trends when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateHomeLink();
+            loadTrends();
+        });
+
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+        }
+
+        function switchModal(targetModal) {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            openModal(targetModal);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
